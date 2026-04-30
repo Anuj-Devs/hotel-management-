@@ -2,7 +2,7 @@
 
 A modern **Hotel Table Management Dashboard** built with **Angular 21** and **Tailwind CSS**, designed to efficiently manage restaurant/hotel table availability, reservations, and occupancy status through an interactive admin panel.
 
-🔗 **Live Demo:** https://hotel-management-one-green.vercel.app/
+🔗 **Live Demo:** https://table-manage-gt.vercel.app/
 
 ---
 

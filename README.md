@@ -258,7 +258,7 @@ If a table is marked as **Occupied**, a quick-action icon becomes available.
 **One-click conversion:**
 ```text
 Occupied → Available
-
+```
 ---
 
 ## 6. Local Storage State Management

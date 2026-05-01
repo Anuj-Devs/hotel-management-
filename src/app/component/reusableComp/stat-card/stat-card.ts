@@ -1,9 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-stat-card',
-  imports: [MatIconModule],
+  imports: [MatIconModule, CommonModule],
   templateUrl: './stat-card.html',
   styleUrl: './stat-card.css',
 })

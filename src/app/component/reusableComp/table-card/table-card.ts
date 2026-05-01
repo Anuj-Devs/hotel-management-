@@ -151,8 +151,8 @@ export class TableCard {
       ) {
         this.errors.totalCapErr = 'Table capacity must be greater than 0';
         shouldStop = true;
-      } else if (this.selectedTableObj.capacity > 12) {
-         this.errors.totalCapErr = 'Table capacity must be less than 10';
+      } else if (this.selectedTableObj.capacity > 16) {
+         this.errors.totalCapErr = 'Table capacity must be less than 16';
           shouldStop = true;
       }
       if (this.selectedTableObj.status == 3) {

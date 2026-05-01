@@ -1,6 +1,6 @@
 <div class="grid lg:grid-cols-4 gap-4">
   @for (item of tablist; track $index) {
-    <div class="w-auto rounded-xl border border-gray-700/40 bg-white/5 hover:from-[#202022] hover:to-[#2a2a2e] shadow-lg p-6 flex justify-between items-center group transition-transform duration-300 hover:scale-102 hover:border-white/40 cursor-pointer" (mouseenter)="onHover(item.statusId)"
+    <div class="w-auto rounded-xl border border-gray-700/40 bg-white/5  shadow-lg p-6 flex justify-between items-center group transition-transform duration-300" [ngClass]="item.title !== 'Total Table' ? 'cursor-pointer hover:from-[#202022] hover:to-[#2a2a2e]  hover:scale-102 hover:border-white/40' : ''" (mouseenter)="onHover(item.statusId)"
   (mouseleave)="onHover(null)">
       <div>
         <p class="text-sm font-semibold">{{item.title}}</p>
@@ -9,7 +9,7 @@
         </div>
       </div>
       <div
-        class="w-12 h-12 flex items-center justify-center rounded-full group-hover:bg-white/10 transition bg-white/5"
+        class="w-12 h-12 flex items-center justify-center rounded-full transition bg-white/5" [ngClass]="item.title !== 'Total Table' ? 'group-hover:bg-white/10' : ''"
       >
       <mat-icon>{{item.icon}}</mat-icon>
       </div>

@@ -93,6 +93,21 @@ Each card contains table-specific information such as:
 - Reservation details (if applicable)
 - Other related metadata
 
+### Table Sorting Based on Activity
+
+Tables are automatically sorted based on latest activity.
+
+- Each table has a `date` field
+- Whenever a table is updated (edit, assign, status change, create), the date is updated
+- Tables are sorted in descending order (latest first)
+
+#### Behavior:
+- Recently updated tables appear at the top
+- Older tables move down automatically
+- Sorting happens in real-time
+
+This helps in tracking latest activity easily in the dashboard.
+
 ### Data Source:
 Initial table data is loaded from a **local JSON file**.
 
@@ -196,6 +211,50 @@ Features:
 - UI re-render without page reload
 
 ---
+
+### Quick Seat (Smart Table Assignment)
+
+A **Quick Seat** button is available next to the **Add Table** button.
+
+Clicking on it opens a popup where the admin enters:
+
+- Guest Name  
+- Number of Guests  
+
+#### Smart Assignment Logic
+
+**1. If suitable table is available:**
+
+- System automatically finds the best-fit available table
+- Table is assigned instantly
+- Status is set to **Occupied**
+- No manual selection required
+
+**2. If no tables are available:**
+
+- Error message is shown:
+  > No tables available right now
+- A button appears:
+  > Create New Table for this Guest
+- On click:
+  - A new popup opens
+  - Guest details are pre-filled
+  - Admin only enters table name
+  - Table is created and directly marked as **Occupied**
+
+**3. If tables are available but not suitable:**
+
+- Error message is shown:
+  > No suitable table available for this guest count
+- A button appears:
+  > Create Table for this Guest
+- Same flow as above:
+  - Pre-filled guest data
+  - Admin creates table
+  - Table is instantly assigned as **Occupied**
+
+---
+
 
 ### Dynamic Snackbar Notifications
 

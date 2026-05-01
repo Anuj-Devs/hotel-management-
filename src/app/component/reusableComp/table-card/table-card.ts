@@ -383,7 +383,7 @@ export class TableCard {
       event.preventDefault();
       this.openAssignPopup();
     }
-    // Ctrl + N --> Create Table Opening
+    // Ctrl + m --> Create Table Opening
     if (event.ctrlKey && event.key.toLowerCase() === 'm') {
       event.preventDefault();
       this.addNewFound();

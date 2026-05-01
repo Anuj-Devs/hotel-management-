@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, signal } from '@angular/core';
 import { NaPipe } from '../../../pipes/na-pipe';
 import { CommonModule, DatePipe } from '@angular/common';
 import { StatusPipe } from '../../../pipes/status/status-pipe';
@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmPopup } from '../confirm-popup/confirm-popup';
 import { GetTableData } from '../../../service/get-table-data';
 import { NoRecordFound } from '../no-record-found/no-record-found';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-table-card',
   imports: [
@@ -19,6 +19,7 @@ import { NoRecordFound } from '../no-record-found/no-record-found';
     FormsModule,
     ConfirmPopup,
     NoRecordFound,
+    MatTooltipModule
   ],
   templateUrl: './table-card.html',
   styleUrl: './table-card.css',
@@ -37,6 +38,7 @@ export class TableCard {
     status: 1,
     capacity: 0,
     isDeleted: false,
+    date: new Date(),
     reserved: { name: '', count: 0, time: new Date() },
     occupied: { name: '', count: 0, time: new Date() },
   };
@@ -62,6 +64,29 @@ export class TableCard {
       isSelected: false,
     },
   ];
+
+  assignPopupVisible = signal(false);
+
+    assignForm = {
+      name: '',
+      count: 0,
+    };
+
+    assignErrors = {
+      name: '',
+      count: '',
+      general: ''
+    };
+
+    openAssignPopup() {
+      this.assignPopupVisible.set(true);
+    }
+
+    closeAssignPopup() {
+      this.assignPopupVisible.set(false);
+      this.assignForm = { name: '', count: 0 };
+      this.assignErrors = { name: '', count: '', general: '' };
+    }
 
   hoverButtonCSS =
     'rounded-full size-9 border text-white/60 hover:text-white/95 border-white/60 cursor-pointer hover:border-white/95 justify-center flex items-center transition duration-200';
@@ -126,6 +151,9 @@ export class TableCard {
       ) {
         this.errors.totalCapErr = 'Table capacity must be greater than 0';
         shouldStop = true;
+      } else if (this.selectedTableObj.capacity > 12) {
+         this.errors.totalCapErr = 'Table capacity must be less than 10';
+          shouldStop = true;
       }
       if (this.selectedTableObj.status == 3) {
         if (this.selectedTableObj.reserved.name === '') {
@@ -174,6 +202,7 @@ export class TableCard {
         this.selectedTableObj.occupied = null;
         this.selectedTableObj.reserved.time = new Date();
       }
+      this.selectedTableObj.date = new Date()
       this.tableUpdated.emit(this.selectedTableObj);
       this.resetToDefault();
       this.isPopupVisible.set(false);
@@ -191,6 +220,7 @@ export class TableCard {
       status: 1,
       capacity: 0,
       isDeleted: false,
+      date: new Date(),
       reserved: { name: '', count: 0, time: new Date() },
       occupied: { name: '', count: 0, time: new Date() },
     };
@@ -237,6 +267,7 @@ export class TableCard {
     const updated = {
       ...item,
       status: 1,
+      date: new Date(),
       occupied: null,
       reserved: null,
     };
@@ -250,6 +281,7 @@ export class TableCard {
     const updated = {
       ...item,
       status: 2,
+      date: new Date(),
       occupied: {
         name: item.reserved.name,
         count: item.reserved.count,
@@ -260,6 +292,110 @@ export class TableCard {
 
     this.tableUpdated.emit(updated);
   }
+
+  assignTableToCustomer() {
+    this.assignErrors = { name: '', count: '', general: '' };
+    let shouldStop = false;
+
+    if (!this.assignForm.name.trim()) {
+      this.assignErrors.name = 'Customer name is required';
+      shouldStop = true;
+    }
+
+    if (this.assignForm.count == 0 ||
+        this.assignForm.count == null) {
+      this.assignErrors.count = 'Guest count must be greater than 0';
+      shouldStop = true;
+    }
+    if (shouldStop) {
+        return;
+      }
+
+    const availableTables = this.tableList.filter(
+      (t: any) => t.status === 1 && !t.isDeleted
+    );
+
+    if (availableTables.length === 0) {
+      this.assignErrors.general = 'No tables available right now'
+      return;
+    }
+
+    const suitableTables = availableTables
+      .filter((t: any) => t.capacity >= this.assignForm.count)
+      .sort((a: any, b: any) => a.capacity - b.capacity);
+
+    if (suitableTables.length === 0) {
+      this.assignErrors.general = 'No suitable table available for this guest count'
+      return;
+    }
+
+    const selectedTable = suitableTables[0];
+
+    const updated = {
+      ...selectedTable,
+      status: 2,
+      date: new Date(),
+      occupied: {
+        name: this.assignForm.name,
+        count: this.assignForm.count,
+        time: new Date(),
+      },
+      reserved: null,
+    };
+
+    this.tableUpdated.emit(updated);
+
+    this.closeAssignPopup();
+  }
+
+  createTableForGuest() {
+  this.assignPopupVisible.set(false);
+
+  this.resetToDefault();
+  this.forLoop(2);
+
+  this.selectedTableObj = {
+    ...this.selectedTableObj,
+    tableNumber: '',
+    capacity: this.assignForm.count || 0,
+    status: 2,
+    date: new Date(),
+    occupied: {
+      name: this.assignForm.name,
+      count: this.assignForm.count,
+      time: new Date(),
+    },
+    reserved: null,
+  };
+
+  this.assignTableId.set(0);
+  this.isPopupVisible.set(true);
+
+  this.assignForm = { name: '', count: 0 };
+  this.assignErrors = { name: '', count: '', general: '' };
+}
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+
+    // Ctrl + K --> Asign Table Opening
+    if (event.ctrlKey && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.openAssignPopup();
+    }
+    // Ctrl + N --> Create Table Opening
+    if (event.ctrlKey && event.key.toLowerCase() === 'm') {
+      event.preventDefault();
+      this.addNewFound();
+    }
+
+    // Esc --> Close Popup Opening
+    if (event.key === 'Escape') {
+      this.closeAssignPopup();
+      this.closePopup();
+    }
+  }
+
 }
 
 class ErrModel {

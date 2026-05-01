@@ -29,7 +29,6 @@
           <div class="pt-4">
             <p class="text-md">Table Capacity: {{ item.capacity }}</p>
           </div>
-
           <div class="pt-4 space-y-2">
             @if (item.status === 2 && item.occupied !== null) {
               <div class="text-md font-bold text-red-500">Occupied by:</div>
@@ -58,31 +57,40 @@
             }
           </div>
           <div
-            class="absolute right-2 top-2 flex flex-wrap gap-2 opacity-0 group-hover:opacity-100"
-          >
-            <div (click)="selectedTable(item)" title="Edit Table" [class]="hoverButtonCSS">
-              <mat-icon class="flex mt-1" style="font-size: 16px">mode_edit</mat-icon>
-            </div>
-            @if (item.status == 2 || item.status == 3) {
-              <div
-                (click)="makeAvailable(item); $event.stopPropagation()"
-                title="Make Table Availabe"
-                [class]="hoverButtonCSS"
+                class="absolute right-2 top-2 flex flex-wrap gap-2 opacity-0 group-hover:opacity-100"
               >
-                <mat-icon class="flex mt-1" style="font-size: 18px">check</mat-icon>
+                <div
+                  (click)="selectedTable(item)"
+                  [class]="hoverButtonCSS"
+                  matTooltip="Edit Table"
+                  matTooltipPosition="above"
+                >
+                  <mat-icon class="flex mt-1" style="font-size: 16px">mode_edit</mat-icon>
+                </div>
+
+                @if (item.status == 2 || item.status == 3) {
+                  <div
+                    (click)="makeAvailable(item); $event.stopPropagation()"
+                    [class]="hoverButtonCSS"
+                    matTooltip="Make Table Available"
+                    matTooltipPosition="above"
+                  >
+                    <mat-icon class="flex mt-1" style="font-size: 18px">check</mat-icon>
+                  </div>
+                }
+
+                @if (item.status == 3) {
+                  <div
+                    (click)="swapToOccupied(item); $event.stopPropagation()"
+                    [class]="hoverButtonCSS"
+                    matTooltip="Convert Reserved to Occupied"
+                    matTooltipPosition="above"
+                  >
+                    <mat-icon class="flex mt-1" style="font-size: 18px">swap_horiz</mat-icon>
+                  </div>
+                }
               </div>
-            }
-            @if (item.status == 3) {
-              <div
-                (click)="swapToOccupied(item); $event.stopPropagation()"
-                title="Convert table from Reserved to Occupied"
-                [class]="hoverButtonCSS"
-              >
-                <mat-icon class="flex mt-1" style="font-size: 18px">swap_horiz</mat-icon>
-              </div>
-            }
           </div>
-        </div>
       }
     </div>
   } @else {
@@ -142,7 +150,7 @@
               id="capacity"
               type="number"
               min="0"
-              max="12"
+              max="10"
               [(ngModel)]="selectedTableObj.capacity"
               (input)="errors.totalCapErr = ''"
               class="px-4 py-2 border rounded w-full"
@@ -252,4 +260,81 @@
   @if (isDeletePopup()) {
     <app-confirm-popup (popupValue)="onEventCall($event)"></app-confirm-popup>
   }
+
+  @if (assignPopupVisible()) {
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white text-black p-6 m-4 rounded-xl w-full max-w-md">
+
+      <div class="flex justify-between items-center border-b pb-3 mb-4">
+         <div class="text-lg font-semibold">
+            Seat Guests
+          </div>
+          <button class="cursor-pointer flex" (click)="closeAssignPopup()">
+            <mat-icon style="font-size: 20px">cancel</mat-icon>
+          </button>
+      </div>
+
+      <div class="space-y-4">
+
+        <div>
+          <label>Guest Name</label>
+          <input
+            type="text"
+            [(ngModel)]="assignForm.name"
+            class="px-4 py-2 border rounded w-full"
+            (input)="assignErrors.name = ''; assignErrors.general = ''"
+            [ngClass]="assignErrors.name ? 'border-red-500' : 'border-gray-300'"
+          />
+          @if (assignErrors.name) {
+            <p class="text-xs text-red-500 font-semibold">
+              {{ assignErrors.name }}
+            </p>
+          }
+        </div>
+
+        <div>
+          <label>Number of Guests</label>
+          <input
+            type="number"
+            [(ngModel)]="assignForm.count"
+            (input)="assignErrors.count = ''; assignErrors.general = ''"
+            class="px-4 py-2 border rounded w-full"
+            [ngClass]="assignErrors.count ? 'border-red-500' : 'border-gray-300'"
+          />
+          @if (assignErrors.count) {
+            <p class="text-xs text-red-500 font-semibold">
+              {{ assignErrors.count }}
+            </p>
+          }
+        </div>
+
+        @if (assignErrors.general) {
+        <div class="bg-red-500/10 border-l-4 border-red-500 p-4 mt-4 rounded space-y-3">
+          
+          <div class="flex gap-3 items-center">
+            <mat-icon class="text-red-500 mt-1">warning</mat-icon>
+            <p class="text-sm font-semibold text-red-600">
+              {{ assignErrors.general }}
+            </p>
+          </div>
+            <button
+              (click)="createTableForGuest()"
+              class="w-full border border-(--red) cursor-pointer text-(--red) py-2 rounded hover:bg-(--red) hover:text-white transition"
+            >
+              Create New Table for this Guest
+            </button>
+        </div>
+      }
+
+        <button
+          (click)="assignTableToCustomer()"
+          class="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
+        >
+          Assign Table
+        </button>
+
+      </div>
+    </div>
+  </div>
+}
 </div>

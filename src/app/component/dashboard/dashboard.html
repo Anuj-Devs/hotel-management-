@@ -10,7 +10,12 @@
             <mat-icon>refresh</mat-icon>
             </div>
           </div>
-          <div>
+          <div class="space-x-4">
+              <button (click)="child.openAssignPopup()" class="w-full md:w-auto">
+              <div class="flex items-center justify-center border border-white px-6 py-1 rounded hover:bg-white hover:text-black cursor-pointer transition w-auto md:w-fit">
+                Quick Seat <span class="ml-2">→</span>
+              </div>
+            </button>
               <button (click)="onAddButtonClick()" class="w-full md:w-auto">
               <div class="flex items-center justify-center border border-white px-6 py-1 rounded hover:bg-white hover:text-black cursor-pointer transition w-auto md:w-fit">
                 Add New Table <span class="ml-2">→</span>

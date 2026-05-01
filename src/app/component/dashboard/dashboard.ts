@@ -18,7 +18,11 @@ export class Dashboard implements OnInit {
   @ViewChild(TableCard) child!: TableCard;
   store = inject(Store);
   stateValue: any;
-  tableValue: any = JSON.parse(localStorage.getItem('tableData') || '[]');
+  tableValue: any = JSON.parse(localStorage.getItem('tableData') || '[]').map((t: any) => ({
+    ...t,
+    date: t.date ? new Date(t.date) : new Date()
+  }))
+  .sort((a: any, b: any) => b.date.getTime() - a.date.getTime());
   tableColor: TableStatus[] = [];
   loading = signal(false);
   hoveredStatus = signal<number | null>(null);
@@ -42,7 +46,12 @@ export class Dashboard implements OnInit {
     this.serviceData.getTableDataFromJSON().subscribe(
       (res: any) => {
         if (res) {
-          this.tableValue = res;
+          this.tableValue = res
+          .map((t: any) => ({
+            ...t,
+            date: t.date ? new Date(t.date) : new Date()
+          }))
+          .sort((a: any, b: any) => b.date.getTime() - a.date.getTime());
           localStorage.setItem('tableData', JSON.stringify(res));
           this.serviceData.updateTableCount();
           this.loading.set(false);
@@ -59,7 +68,12 @@ export class Dashboard implements OnInit {
     this.loading.set(true);
     setTimeout(() => {
       this.stateValue = this.serviceData.tableCountSignal;
-      this.tableValue = JSON.parse(localStorage.getItem('tableData') || '[]');
+      this.tableValue = JSON.parse(localStorage.getItem('tableData') || '[]')
+        .map((t: any) => ({
+          ...t,
+          date: t.date ? new Date(t.date) : new Date()
+        }))
+        .sort((a: any, b: any) => b.date.getTime() - a.date.getTime());
       this.loading.set(false);
     }, 1000);
   }
@@ -113,6 +127,9 @@ export class Dashboard implements OnInit {
         }
       }
     }
+    this.tableValue.sort(
+      (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
     localStorage.setItem('tableData', JSON.stringify(this.tableValue));
     setTimeout(() => {
       this.serviceData.updateTableCount()
